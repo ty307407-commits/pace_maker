@@ -13,7 +13,8 @@ import { GoalTimeline } from '../../components/ui/GoalTimeline';
 export default function CreateGoalPage() {
     const router = useRouter();
     const { setGoal, isLoading } = useGoal();
-    const { t } = useLanguage();
+    const { t, language } = useLanguage();
+    const [saveLoading, setSaveLoading] = useState(false);
 
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
@@ -63,6 +64,7 @@ export default function CreateGoalPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setSaveLoading(true);
 
         const newGoalId = `goal-${Date.now()}`;
         const newGoal: any = {
@@ -88,6 +90,8 @@ export default function CreateGoalPage() {
         } catch (error) {
             console.error('Failed to save goal:', error);
             alert('Failed to save goal. Please try again.');
+        } finally {
+            setSaveLoading(false);
         }
     };
 
@@ -333,10 +337,20 @@ export default function CreateGoalPage() {
 
                     <div className="flex justify-end pt-8 pb-20">
                         <button
-                            onClick={handleSubmit}
-                            className="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white text-xl font-bold rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all flex items-center justify-center gap-3 transform hover:scale-[1.02]"
+                            type="submit"
+                            disabled={saveLoading}
+                            className="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white text-xl font-bold rounded-2xl shadow-[0_0_20px_rgba(34,197,94,0.3)] transition-all flex items-center justify-center gap-3 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <FaCheck /> {t('create.create_btn')}
+                            {saveLoading ? (
+                                <>
+                                    <span className="animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full mr-2"></span>
+                                    {language === 'ja' ? '保存中...' : 'Saving...'}
+                                </>
+                            ) : (
+                                <>
+                                    <FaCheck /> {t('create.create_btn')}
+                                </>
+                            )}
                         </button>
                     </div>
 
