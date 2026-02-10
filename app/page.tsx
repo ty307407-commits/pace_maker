@@ -30,19 +30,28 @@ export default function Home() {
     // Wait for both auth and goal loading to complete
     if (authLoading || isLoading) return;
 
-    if (!goal) {
-      // If no goal, redirect to setup or create
-      // If no user profile either, go to setup. If user profile exists but no goal, go to create-goal.
-      if (!userProfile) {
-        router.push('/setup');
-      } else {
-        router.push('/create-goal');
-      }
+    if (!user) {
+      router.push('/login');
+      return;
     }
-  }, [goal, userProfile, isLoading, authLoading, router]);
 
-  if (isLoading || !goal || !userProfile) {
+    if (!userProfile) {
+      router.push('/setup');
+      return;
+    }
+
+    if (!goal) {
+      router.push('/create-goal');
+    }
+  }, [user, goal, userProfile, isLoading, authLoading, router]);
+
+  if (authLoading || isLoading) {
     return <div className="min-h-screen flex items-center justify-center text-white">Loading your journey...</div>;
+  }
+
+  // Redirects will happen in useEffect, but we need to return null here to prevent rendering errors
+  if (!user || !userProfile || !goal) {
+    return null;
   }
 
   const handleMilestoneClick = (milestone: Milestone) => {

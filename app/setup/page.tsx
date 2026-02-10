@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '../../context/LanguageContext';
@@ -17,6 +17,14 @@ export default function SetupPage() {
     const [step, setStep] = useState(1);
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [name, setName] = useState('');
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, router]);
+
+    if (!user) return null;
 
     const handleNameSubmit = (e: React.FormEvent) => {
         e.preventDefault();

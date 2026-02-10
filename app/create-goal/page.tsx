@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useGoal } from '../../context/GoalContext';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaPlus, FaCheck, FaArrowLeft, FaMapMarkedAlt, FaTrash } from 'react-icons/fa';
 import { format, addDays } from 'date-fns';
@@ -13,7 +14,17 @@ import { GoalTimeline } from '../../components/ui/GoalTimeline';
 export default function CreateGoalPage() {
     const router = useRouter();
     const { setGoal, isLoading } = useGoal();
+    const { user } = useAuth();
     const { t, language } = useLanguage();
+
+    useEffect(() => {
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, router]);
+
+    if (!user) return null;
+
     const [saveLoading, setSaveLoading] = useState(false);
 
     const [title, setTitle] = useState('');
