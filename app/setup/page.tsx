@@ -7,10 +7,13 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useGoal } from '../../context/GoalContext';
 import { FaGlobe, FaUser, FaBell, FaEnvelope, FaComment, FaBan, FaCheck, FaArrowRight } from 'react-icons/fa';
 
+import { useAuth } from '../../context/AuthContext';
+
 export default function SetupPage() {
     const router = useRouter();
     const { t, language, setLanguage } = useLanguage();
-    const { setUserProfile } = useGoal();
+    const { setUserProfile, userProfile, isLoading: goalLoading } = useGoal();
+    const { user, signOut } = useAuth();
     const [step, setStep] = useState(1);
     const [answers, setAnswers] = useState<Record<string, string>>({});
     const [name, setName] = useState('');
@@ -158,6 +161,23 @@ export default function SetupPage() {
                                 >
                                     <span>{t('setup.next')}</span> <FaArrowRight />
                                 </button>
+
+                                {/* DEBUG INFO */}
+                                <div className="mt-8 p-4 bg-black/50 rounded-xl text-left text-xs text-slate-400 font-mono">
+                                    <p className="mb-2 font-bold text-white">🚧 DEBUG INFO 🚧</p>
+                                    <p>User ID: <span className="text-yellow-400">{user?.id || 'Not Logged In'}</span></p>
+                                    <p>Profile Status: <span className={userProfile ? "text-green-400" : "text-red-400"}>{userProfile ? 'Loaded' : 'Null'}</span></p>
+                                    <p>Goal Loading: {goalLoading ? 'Yes' : 'No'}</p>
+                                    <div className="mt-4 pt-4 border-t border-white/10">
+                                        <button
+                                            type="button"
+                                            onClick={() => signOut()}
+                                            className="text-red-400 hover:text-red-300 underline font-bold"
+                                        >
+                                            Force Logout (ログアウトしてやり直す)
+                                        </button>
+                                    </div>
+                                </div>
                             </motion.form>
                         )}
 
