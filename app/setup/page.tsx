@@ -52,7 +52,7 @@ export default function SetupPage() {
         }
     };
 
-    const finishSetup = () => {
+    const finishSetup = async () => {
         let type: any = 'STEADY';
         let multiplier = 1.0;
 
@@ -66,20 +66,24 @@ export default function SetupPage() {
 
         const notifMethod = (answers['notifications'] as any) || 'NONE';
 
-        setUserProfile({
-            name: answers['name'] || 'User',
-            personalityType: type,
-            pacingMultiplier: multiplier,
-            notifications: {
-                enabled: notifMethod !== 'NONE',
-                method: notifMethod,
-                time: '09:00'
-            },
-            streak: 1,
-            lastLoginDate: new Date().toISOString().split('T')[0]
-        });
-
-        router.push('/create-goal'); // Go to goal creation directly after setup
+        try {
+            await setUserProfile({
+                name: answers['name'] || 'User',
+                personalityType: type,
+                pacingMultiplier: multiplier,
+                notifications: {
+                    enabled: notifMethod !== 'NONE',
+                    method: notifMethod,
+                    time: '09:00'
+                },
+                streak: 1,
+                lastLoginDate: new Date().toISOString().split('T')[0]
+            });
+            router.push('/create-goal'); // Go to goal creation directly after setup
+        } catch (error) {
+            console.error('Failed to save profile:', error);
+            alert('Failed to save profile. Please try again.');
+        }
     };
 
     return (

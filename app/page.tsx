@@ -9,13 +9,22 @@ import { differenceInDays, addDays, format } from 'date-fns';
 import { FaFire, FaCalendarCheck, FaChartLine, FaGlobe } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { useGoal } from '../context/GoalContext';
+import { useAuth } from '../context/AuthContext';
 
 export default function Home() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const { goal, setGoal, userProfile, isLoading } = useGoal();
   const [selectedMilestone, setSelectedMilestone] = useState<Milestone | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/login');
+    }
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     if (!isLoading && !goal) {

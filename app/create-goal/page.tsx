@@ -61,7 +61,7 @@ export default function CreateGoalPage() {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         const newGoalId = `goal-${Date.now()}`;
@@ -82,8 +82,13 @@ export default function CreateGoalPage() {
                     category === 'HEALTH' ? "hsl(140, 70%, 50%)" : "hsl(250, 80%, 60%)"
         };
 
-        setGoal(newGoal);
-        router.push('/');
+        try {
+            await setGoal(newGoal);
+            router.push('/');
+        } catch (error) {
+            console.error('Failed to save goal:', error);
+            alert('Failed to save goal. Please try again.');
+        }
     };
 
     return (
