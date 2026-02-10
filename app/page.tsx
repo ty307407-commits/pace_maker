@@ -27,7 +27,10 @@ export default function Home() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (!isLoading && !goal) {
+    // Wait for both auth and goal loading to complete
+    if (authLoading || isLoading) return;
+
+    if (!goal) {
       // If no goal, redirect to setup or create
       // If no user profile either, go to setup. If user profile exists but no goal, go to create-goal.
       if (!userProfile) {
@@ -36,7 +39,7 @@ export default function Home() {
         router.push('/create-goal');
       }
     }
-  }, [goal, userProfile, isLoading, router]);
+  }, [goal, userProfile, isLoading, authLoading, router]);
 
   if (isLoading || !goal || !userProfile) {
     return <div className="min-h-screen flex items-center justify-center text-white">Loading your journey...</div>;
