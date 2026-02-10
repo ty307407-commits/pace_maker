@@ -131,7 +131,7 @@ export default function Home() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: user?.email,
+          email: 'ty307407@gmail.com', // FORCE: Must be the verified Resend account email
           username: userProfile?.name || 'User',
           goalTitle: goal?.title || 'Goal',
           progress: goal?.progress || 0,
