@@ -125,30 +125,6 @@ export default function Home() {
     );
   };
 
-  const sendTestEmail = async () => {
-    try {
-      const res = await fetch('/api/send-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'ty307407@gmail.com', // FORCE: Must be the verified Resend account email
-          username: userProfile?.name || 'User',
-          goalTitle: goal?.title || 'Goal',
-          progress: goal?.progress || 0,
-          message: 'Hello from Test Button!'
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        alert('Email sent successfully! Check your inbox.');
-      } else {
-        alert('Failed to send: ' + JSON.stringify(data));
-      }
-    } catch (err: any) {
-      alert('Error: ' + err.message);
-    }
-  };
-
   return (
     <main className="min-h-screen p-4 md:p-8 max-w-7xl mx-auto space-y-8 pb-20">
       {/* Dynamic Background Elements */}
@@ -169,12 +145,7 @@ export default function Home() {
         </div>
 
         <div className="flex flex-wrap gap-4">
-          <button
-            onClick={sendTestEmail}
-            className="glass-panel px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-white/5 transition-colors border border-indigo-500/30 text-indigo-300 font-bold"
-          >
-            <span>📧 Test</span>
-          </button>
+
           <button
             onClick={() => setLanguage(language === 'en' ? 'ja' : 'en')}
             className="glass-panel px-4 py-2 rounded-xl flex items-center gap-2 hover:bg-white/5 transition-colors"
