@@ -35,22 +35,33 @@ export function GoalProvider({ children }: { children: ReactNode }) {
     }, [user]);
 
     const loadUserData = async () => {
-        if (!user) return;
+        if (!user) {
+            setIsLoading(false);
+            return;
+        }
 
         try {
-            // Load profile
+            console.log('Loading user data for:', user.id);
+
+            // 1. Load profile
             const { data: profile, error: profileError } = await supabase
                 .from('profiles')
                 .select('*')
                 .eq('id', user.id)
                 .single();
 
-            if (profileError && profileError.code !== 'PGRST116') {
-                console.error('Error loading profile:', profileError);
+            if (profileError) {
+                if (profileError.code !== 'PGRST116') { // PGRST116 is "No rows returned"
+                    console.error('Error loading profile:', profileError);
+                } else {
+                    console.log('No profile found (new user)');
+                }
             }
 
             if (profile) {
-                // Update streak
+                console.log('Profile found:', profile);
+
+                // Update streak logic
                 const today = format(new Date(), 'yyyy-MM-dd');
                 let updatedProfile = { ...profile };
 
@@ -63,10 +74,11 @@ export function GoalProvider({ children }: { children: ReactNode }) {
                     } else if (diff > 1) {
                         updatedProfile.streak = 1;
                     }
+                    // If diff is 0 (same day), do nothing
 
                     updatedProfile.last_login_date = today;
 
-                    // Update in database
+                    // Update in database silently
                     await supabase
                         .from('profiles')
                         .update({
@@ -84,9 +96,11 @@ export function GoalProvider({ children }: { children: ReactNode }) {
                     streak: updatedProfile.streak,
                     lastLoginDate: updatedProfile.last_login_date
                 });
+            } else {
+                setUserProfileState(null);
             }
 
-            // Load goal with milestones
+            // 2. Load goal (only if profile exists, but we check anyway to be safe)
             const { data: goals, error: goalError } = await supabase
                 .from('goals')
                 .select(`
@@ -103,6 +117,8 @@ export function GoalProvider({ children }: { children: ReactNode }) {
 
             if (goals && goals.length > 0) {
                 const goalData = goals[0];
+                console.log('Goal found:', goalData);
+
                 setGoalState({
                     id: goalData.id,
                     title: goalData.title,
@@ -121,11 +137,15 @@ export function GoalProvider({ children }: { children: ReactNode }) {
                         status: m.status,
                         difficulty: m.difficulty,
                         progress: m.progress
-                    }))
+                    })).sort((a: any, b: any) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime())
                 });
+            } else {
+                console.log('No goals found');
+                setGoalState(null);
             }
+
         } catch (error) {
-            console.error('Error in loadUserData:', error);
+            console.error('Critical Error in loadUserData:', error);
         } finally {
             setIsLoading(false);
         }
